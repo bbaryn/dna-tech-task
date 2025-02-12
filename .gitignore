@@ -21,6 +21,8 @@ build
 # ignore test converage
 coverage
 
+dist
+
 # Environment varibles
 *.env
 *.env.test

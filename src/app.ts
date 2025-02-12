@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+
 import { environment } from './common/config';
 import { Errors, ErrorType, InternalError, NotFoundError } from './core/Errors';
 import Logger from './core/Logger';

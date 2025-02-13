@@ -49,9 +49,10 @@ class RedisSingleton {
 
   async get(key: RedisKey) {
     try {
+      console.log(await this.client.ttl(key));
       return this.client.get(key);
     } catch (err) {
-      Logger.error('Błąd podczas pobierania:', err);
+      Logger.error('Error during use get method', err);
     }
   }
 
@@ -59,7 +60,7 @@ class RedisSingleton {
     try {
       return this.client.del(key);
     } catch (err) {
-      Logger.error('Błąd podczas usuwania:', err);
+      Logger.error('Error during use delete method', err);
     }
   }
 
@@ -67,7 +68,7 @@ class RedisSingleton {
     try {
       await this.client.quit();
     } catch (err) {
-      Logger.error('Błąd podczas zamykania połączenia:', err);
+      Logger.error('Error during disconnection', err);
     }
   }
 }

@@ -1,40 +1,76 @@
-import { NextFunction, Request, Response } from 'express';
-import Redis from 'ioredis';
+import Redis, { RedisKey } from 'ioredis';
 import { redis } from '../common/config';
 import Logger from '../core/Logger';
 
-let redisClient;
+class RedisSingleton {
+  static instance: RedisSingleton = null;
+  private client: Redis = null;
 
-async function initializeRedisClient() {
-  redisClient = new Redis({
-    port: redis.port,
-    host: redis.host,
-    password: redis.password,
-  });
+  constructor() {
+    if (!RedisSingleton.instance) {
+      this.client = new Redis({
+        host: redis.host,
+        port: redis.port,
+        password: redis.password,
+      });
 
-  redisClient.on('connect', () => Logger.info('Cache is connecting'));
-  redisClient.on('ready', () => Logger.info('Cache is ready'));
-  redisClient.on('end', () => Logger.info('Cache disconnected'));
-  redisClient.on('reconnecting', () => Logger.info('Cache is reconnecting'));
-  redisClient.on('error', (e) => Logger.error(e));
+      this.client.on('connect', () => Logger.info('Cache is connecting'));
+      this.client.on('ready', () => Logger.info('Cache is ready'));
+      this.client.on('end', () => Logger.info('Cache disconnected'));
+      this.client.on('reconnecting', () =>
+        Logger.info('Cache is reconnecting'),
+      );
+      this.client.on('error', (e) => Logger.error(e));
 
-  (async () => {
-    await redisClient.connect();
-  })();
+      RedisSingleton.instance = this;
+    }
 
-  process.on('SIGINT', async () => {
-    await redisClient.disconnect();
-  });
-}
+    process.on('SIGINT', async () => {
+      await this.client.disconnect();
+    });
 
-async function checkCache(req: Request, res: Response, next: NextFunction) {
-  const cachedData = await redisClient.get('cachedData');
+    return RedisSingleton.instance;
+  }
 
-  if (cachedData) {
-    res.send(JSON.parse(cachedData));
-  } else {
-    next();
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    expiry: number | string,
+  ) {
+    try {
+      if (expiry) {
+        return this.client.set(key, value, 'EX', expiry);
+      }
+      return this.client.set(key, value);
+    } catch (err) {
+      Logger.error('Error during use set method', err);
+    }
+  }
+
+  async get(key: RedisKey) {
+    try {
+      return this.client.get(key);
+    } catch (err) {
+      Logger.error('Błąd podczas pobierania:', err);
+    }
+  }
+
+  async delete(key: RedisKey) {
+    try {
+      return this.client.del(key);
+    } catch (err) {
+      Logger.error('Błąd podczas usuwania:', err);
+    }
+  }
+
+  async disconnect() {
+    try {
+      await this.client.quit();
+    } catch (err) {
+      Logger.error('Błąd podczas zamykania połączenia:', err);
+    }
   }
 }
 
-export default initializeRedisClient;
+const redisInstance = new RedisSingleton();
+export default redisInstance;

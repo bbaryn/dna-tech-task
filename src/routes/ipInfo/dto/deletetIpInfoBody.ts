@@ -1,6 +1,6 @@
 import { IsIP } from 'class-validator';
 
-export class IpInfoQuery {
+export class DeleteIpInfoBody {
   @IsIP()
   ip: string;
 }

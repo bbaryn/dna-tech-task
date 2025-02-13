@@ -2,17 +2,22 @@ import axios from 'axios';
 import express, { Request, Response } from 'express';
 import redisInstance from '../../cache/redis';
 import { EXPIRATION_IN_SECONDS } from '../../common/constants';
-import { InternalErrorResponse, SuccessResponse } from '../../core/Responses';
+import {
+  InternalErrorResponse,
+  NoContentResponse,
+  SuccessResponse,
+} from '../../core/Responses';
 import validator, { ValidationSource } from '../../helpers/validator';
 import checkCache from '../../middleware/checkCache';
-import { IpInfoQuery } from './dto/IpInfoQuery.dto';
+import { DeleteIpInfoBody } from './dto/DeletetIpInfoBody';
+import { GetIpInfoQuery } from './dto/getIpInfoQuery';
 
 const router = express.Router();
 
 router.get(
   '/',
   checkCache,
-  validator(IpInfoQuery, ValidationSource.Query),
+  validator(GetIpInfoQuery, ValidationSource.Query),
   async (req: Request, res: Response) => {
     try {
       const response = await axios.get(`http://ipwho.is/${req.query.ip}`);
@@ -24,6 +29,20 @@ router.get(
       );
 
       return new SuccessResponse('success', response.data).send(res);
+    } catch (error) {
+      return new InternalErrorResponse(error);
+    }
+  },
+);
+
+router.delete(
+  '/',
+  validator(DeleteIpInfoBody, ValidationSource.Body),
+  async (req: Request, res: Response) => {
+    try {
+      await redisInstance.delete(`${req.body.ip}`);
+
+      return new NoContentResponse().send(res);
     } catch (error) {
       return new InternalErrorResponse(error);
     }

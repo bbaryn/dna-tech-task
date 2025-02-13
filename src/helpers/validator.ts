@@ -5,6 +5,7 @@ import { BadRequestError } from '../core/Errors';
 
 export enum ValidationSource {
   Query = 'query',
+  Body = 'body',
 }
 
 export default <T extends object>(
@@ -13,8 +14,8 @@ export default <T extends object>(
   ) =>
   async (req: Request, _: Response, next: NextFunction) => {
     try {
-      const query = plainToInstance(schema, req[source]);
-      const errors = await validate(query);
+      const instance = plainToInstance(schema, req[source]);
+      const errors = await validate(instance);
 
       if (!errors.length) return next();
 

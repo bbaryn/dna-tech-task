@@ -49,7 +49,6 @@ class RedisSingleton {
 
   async get(key: RedisKey) {
     try {
-      console.log(await this.client.ttl(key));
       return this.client.get(key);
     } catch (err) {
       Logger.error('Error during use get method', err);

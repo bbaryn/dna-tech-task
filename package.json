@@ -4,8 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start:dev": "nodemon -r dotenv/config src/index.ts",
     "start": "ts-node -r dotenv/config src/index.ts",
+    "start:dev": "nodemon -r dotenv/config src/index.ts",
+    "start:prod": "tsc && node -r dotenv/config dist/index.js",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",

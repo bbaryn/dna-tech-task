@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    env_file:
+      - .env.development
+    ports:
+      - '$PORT:$PORT'
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  redis:
+    image: 'redis:latest'
+    container_name: redis
+    restart: unless-stopped
+    env_file:
+      - .env.development
+    ports:
+      - '$REDIS_PORT:$REDIS_PORT'
+    command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_PASSWORD
+    volumes:
+      - cache:/data/cache
+
+volumes:
+  dbdata:
+  cache:
+    driver: local

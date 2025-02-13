@@ -9,7 +9,7 @@ import {
 } from '../../core/Responses';
 import validator, { ValidationSource } from '../../helpers/validator';
 import checkCache from '../../middleware/checkCache';
-import { DeleteIpInfoBody } from './dto/DeletetIpInfoBody';
+import { DeleteIpInfoBody } from './dto/deleteIpInfoBody';
 import { GetIpInfoQuery } from './dto/getIpInfoQuery';
 
 const router = express.Router();

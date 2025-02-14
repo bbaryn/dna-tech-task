@@ -6,7 +6,6 @@ The development of this API follows a well-structured architectural approach, ad
 
 Overall, the API was built with efficiency, maintainability, and performance in mind, offering a structured yet lightweight solution for retrieving IP-related information while optimizing response times through caching.
 
-
 ## How to start
 
 Steps needed to run application:
@@ -70,3 +69,4 @@ Steps needed to run application:
 - [ ] Write tests
 - [ ] Refactor to use DDD
 - [ ] Implement NestJS
+- [ ] Refactor Responses

@@ -29,11 +29,6 @@ class RedisService implements ICacheService {
     this.client.on('end', () => Logger.info('Cache disconnected'));
     this.client.on('reconnecting', () => Logger.info('Cache is reconnecting'));
     this.client.on('error', (e) => Logger.error(e));
-
-    process.on('SIGINT', async () => {
-      await this.client.quit();
-      Logger.info('Redis client disconnected on app termination');
-    });
   }
 
   public static getInstance(): RedisService {

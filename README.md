@@ -13,12 +13,17 @@ Steps needed to run application:
 * Run using Docker Compose [**Recommended Method**] 
   1. Run `npm install`
   2. Copy the contents of `.env.example` to an `.env` file using `cp .env.example .env` and complete with data
+     1. Set 'redis' as REDIS_HOST
   3. Run `docker-compose up -d`
 
 * Install Without Docker [**2nd Method**]
   1. Run `npm install`
   2. Copy the contents of `.env.example` to an `.env` file using `cp .env.example .env` and complete with data
-  3. Run `npm run start` to run application
+     1. Set 'localhost' as REDIS_HOST
+  3. Install and run Redis in local environment
+     1. For MacOS `brew services restart redis`
+     2. Set password for it and restart
+  4. Run `npm run start` to run application
 
  ## Project Directory Structure
  ```

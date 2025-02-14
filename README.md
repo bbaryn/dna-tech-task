@@ -22,7 +22,7 @@ Steps needed to run application:
      1. Set 'localhost' as REDIS_HOST
   3. Install and run Redis in local environment
      1. For MacOS `brew services restart redis`
-     2. Set password for it and restart
+     2. Set password for it and restart (check it out in the redis documentation)
   4. Run `npm run start` to run application
 
  ## Project Directory Structure

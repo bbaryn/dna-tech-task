@@ -12,7 +12,7 @@ Steps needed to run application:
 
 * Run using Docker Compose [**Recommended Method**] 
   1. Run `npm install`
-  2. Copy the contents of `.env.development` to an `.env` file using `cp .env.development .env` and complete with data
+  2. Copy the contents of `.env.example` to an `.env` file using `cp .env.example .env` and complete with data
   3. Run `docker-compose up -d`
 
 * Install Without Docker [**2nd Method**]

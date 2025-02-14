@@ -50,5 +50,8 @@
     "ts-node": "10.9.2",
     "winston": "3.17.0",
     "winston-daily-rotate-file": "5.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

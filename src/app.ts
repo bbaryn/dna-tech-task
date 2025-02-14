@@ -1,7 +1,13 @@
 import express, { Request, Response } from 'express';
 
 import { environment } from './common/config';
-import { Errors, ErrorType, InternalError, NotFoundError } from './core/Errors';
+import {
+  AppError,
+  ErrorHandler,
+  ErrorType,
+  InternalError,
+  NotFoundError,
+} from './core/Errors';
 import Logger from './core/Logger';
 import routes from './routes';
 
@@ -18,8 +24,8 @@ app.use('/', routes);
 app.use((_, __, next) => next(new NotFoundError()));
 
 app.use((err: Error, req: Request, res: Response) => {
-  if (err instanceof Errors) {
-    Errors.handle(err, res);
+  if (err instanceof AppError) {
+    ErrorHandler.handle(err, res);
     if (err.type === ErrorType.INTERNAL)
       Logger.error(
         `500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`,
@@ -32,7 +38,7 @@ app.use((err: Error, req: Request, res: Response) => {
     if (environment === 'development') {
       return res.status(500).send(err);
     }
-    Errors.handle(new InternalError(), res);
+    ErrorHandler.handle(new InternalError(), res);
   }
 });
 

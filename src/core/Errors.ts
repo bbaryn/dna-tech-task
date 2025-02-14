@@ -12,45 +12,76 @@ export enum ErrorType {
   INTERNAL = 'InternalError',
 }
 
-export abstract class Errors extends Error {
+interface ErrorResponder {
+  send(res: Response): Response;
+}
+
+class BadRequestResponder implements ErrorResponder {
+  constructor(private message: string) {}
+  send(res: Response): Response {
+    return new BadRequestResponse(this.message).send(res);
+  }
+}
+
+class NotFoundResponder implements ErrorResponder {
+  constructor(private message: string) {}
+  send(res: Response): Response {
+    return new NotFoundResponse(this.message).send(res);
+  }
+}
+
+class InternalErrorResponder implements ErrorResponder {
+  constructor(private message: string) {}
+  send(res: Response): Response {
+    return new InternalErrorResponse(this.message).send(res);
+  }
+}
+
+export abstract class AppError extends Error {
   constructor(
     public type: ErrorType,
     public message: string = 'error',
   ) {
     super(type);
   }
-
-  public static handle(err: Errors, res: Response): Response {
-    switch (err.type) {
-      case ErrorType.INTERNAL:
-        return new InternalErrorResponse(err.message).send(res);
-      case ErrorType.NOT_FOUND:
-        return new NotFoundResponse(err.message).send(res);
-      case ErrorType.BAD_REQUEST:
-        return new BadRequestResponse(err.message).send(res);
-      default: {
-        let message = err.message;
-        if (environment === 'production') message = 'Something wrong happened.';
-        return new InternalErrorResponse(message).send(res);
-      }
-    }
-  }
 }
 
-export class InternalError extends Errors {
+export class InternalError extends AppError {
   constructor(message = 'Internal error') {
     super(ErrorType.INTERNAL, message);
   }
 }
 
-export class BadRequestError extends Errors {
+export class BadRequestError extends AppError {
   constructor(message = 'Bad Request') {
     super(ErrorType.BAD_REQUEST, message);
   }
 }
 
-export class NotFoundError extends Errors {
+export class NotFoundError extends AppError {
   constructor(message = 'Not Found') {
     super(ErrorType.NOT_FOUND, message);
+  }
+}
+
+export class ErrorHandler {
+  private static responderMap: Record<
+    ErrorType,
+    new (message: string) => ErrorResponder
+  > = {
+    [ErrorType.BAD_REQUEST]: BadRequestResponder,
+    [ErrorType.NOT_FOUND]: NotFoundResponder,
+    [ErrorType.INTERNAL]: InternalErrorResponder,
+  };
+
+  public static handle(err: AppError, res: Response): Response {
+    const ResponderClass =
+      this.responderMap[err.type] || InternalErrorResponder;
+    const message =
+      environment === 'production' && err.type === ErrorType.INTERNAL
+        ? 'Something wrong happened.'
+        : err.message;
+
+    return new ResponderClass(message).send(res);
   }
 }

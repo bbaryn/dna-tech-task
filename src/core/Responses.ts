@@ -2,9 +2,8 @@ import { Response } from 'express';
 
 enum ResponseStatus {
   SUCCESS = 200,
+  NO_CONTENT = 204,
   BAD_REQUEST = 400,
-  UNAUTHORIZED = 401,
-  FORBIDDEN = 403,
   NOT_FOUND = 404,
   INTERNAL_ERROR = 500,
 }
@@ -12,7 +11,7 @@ enum ResponseStatus {
 abstract class Responses {
   constructor(
     protected status: ResponseStatus,
-    protected message: string,
+    protected message?: string,
   ) {}
 
   protected prepare<T extends Responses>(
@@ -62,12 +61,6 @@ export class InternalErrorResponse extends Responses {
   }
 }
 
-export class SuccessMsgResponse extends Responses {
-  constructor(message: string) {
-    super(ResponseStatus.SUCCESS, message);
-  }
-}
-
 export class FailureMsgResponse extends Responses {
   constructor(message: string) {
     super(ResponseStatus.SUCCESS, message);
@@ -75,11 +68,20 @@ export class FailureMsgResponse extends Responses {
 }
 
 export class SuccessResponse<T> extends Responses {
-  constructor(message: string) {
+  constructor(
+    message: string,
+    private data: T,
+  ) {
     super(ResponseStatus.SUCCESS, message);
   }
 
   send(res: Response, headers: { [key: string]: string } = {}): Response {
     return super.prepare<SuccessResponse<T>>(res, this, headers);
+  }
+}
+
+export class NoContentResponse extends Responses {
+  constructor() {
+    super(ResponseStatus.NO_CONTENT);
   }
 }
